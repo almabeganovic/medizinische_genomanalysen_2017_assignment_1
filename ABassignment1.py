@@ -76,7 +76,7 @@ class Assignment1:
         for read in samFile:
             columns = str(read).split("\t")
             if "I" in str(columns[5]) or "D" in str(columns[5]):
-                print("-reads_with_indels:")
+                print("-gene_reads_with_indels:")
                 print(read)
         samFile.close()
 
@@ -88,7 +88,6 @@ class Assignment1:
         print(cov)
 
 
-
     def calculate_gene_average_coverage(self):
         #a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
         a = pybedtools.BedTool(self.geneinfo)
@@ -98,14 +97,24 @@ class Assignment1:
 
 
     def get_number_mapped_reads(self):
-        print ("todo")
+        samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
+        n = 0
+        for read in samFile:
+            if not read.is_unmapped:
+                n += 1
+        if n == 0:
+            print ("-number_nonmapped_reads:")
+        else:
+            print("-number_mapped_reads:")
+            print(n)
+        samFile.close()
 
 
     def get_gene_symbol(self):
         print("-gene_symbol:", self.geneinfo[0]);
         return self.geneinfo[0]
 
-#
+
     def get_region_of_gene(self):
         print("-region_of_gene on {} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
 
@@ -121,13 +130,10 @@ class Assignment1:
         #self.get_gene_reads_with_indels();
         #self.calculate_total_average_coverage();
         #self.calculate_gene_average_coverage();
-        # self.number_mapped_reads();
-       # self.get_gene_symbol();
-        #self.get_region_of_gene();
+        self.get_number_mapped_reads();
+        self.get_gene_symbol();
+        self.get_region_of_gene();
         self.get_number_of_exons();
-
-
-
 
 
 if __name__ == '__main__':
