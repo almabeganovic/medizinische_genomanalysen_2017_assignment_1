@@ -112,7 +112,7 @@ class Assignment1:
         samFile.close()
 
 
-    ## Gene Symbol and the [0] position will be printed out
+    ## Gene Symbol on the position[0] will be printed out
     def get_gene_symbol(self):
         print("-gene_symbol:")
         print(self.geneinfo[0])
@@ -124,7 +124,7 @@ class Assignment1:
         print("{} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
 
 
-    ## Number of exon and the [6] position will be printed out
+    ## Number of exon on the position [6] will be printed out
     def get_number_of_exons(self):
         print("-number_of_exons:")
         print (self.geneinfo[6])
