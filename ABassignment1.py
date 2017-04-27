@@ -2,7 +2,7 @@ import mysql.connector
 import sys
 import pysam
 import pybedtools
-
+import subprocess
 
 __author__ = 'Alma Beganovic'
 
@@ -54,10 +54,12 @@ class Assignment1:
         print ("Done fetching data")
 
     def get_sam_header(self):
-        for line in open('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam',"rb"):
-            if line.startswith(b'@'):
-                print("-sam_header:")
-                print (line)
+        print("-sam_header:")
+        cmd = ["samtools view -H {}".format('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')]
+        subprocess.call(cmd, shell=True)
+        print ()
+
+
 
     # http://pysam.readthedocs.io/en/latest/api.html
     # For the function, .bam file must be sorted and indexed (samtools index HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam )
@@ -71,7 +73,6 @@ class Assignment1:
         samFile.close()
 
 
-    ## Indels will be printed out, when in colimn[5] "I" or "D" occur
     def get_gene_reads_with_indels(self):
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
         print('Gene_reads_with_indels:')
@@ -82,22 +83,19 @@ class Assignment1:
                 print(read)
         samFile.close()
 
+        def calculate_total_average_coverage(self):
+            a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
+            cov = a.genome_coverage(bg=True)
+            print("-total_average_coverage:")
+            print(cov)
 
-    def calculate_total_average_coverage(self):
-        a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
-        cov = a.genome_coverage(bg=True)
-        print("-total_average_coverage:")
-        print(cov)
+        def calculate_gene_average_coverage(self):
+            # a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
+            a = pybedtools.BedTool(self.geneinfo)
+            cov = a.coverage(bg=True)
+            print("-gene_average_coverage:")
+            print(cov.head())
 
-
-    def calculate_gene_average_coverage(self):
-        a = pybedtools.BedTool(self.geneinfo)
-        cov = a.coverage(bg=True)
-        print("-gene_average_coverage:")
-        print(cov.head())
-
-
-    ## Number mapped reads will be printed out, when 1=0001 -> PE read
     def get_number_mapped_reads(self):
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
         n = 0
@@ -111,8 +109,7 @@ class Assignment1:
             print(n)
         samFile.close()
 
-
-    ## Gene Symbol on the position[0] will be printed out
+    ## Gene Symbol and the first position will be printed out
     def get_gene_symbol(self):
         print("-gene_symbol:")
         print(self.geneinfo[0])
@@ -122,9 +119,9 @@ class Assignment1:
     def get_region_of_gene(self):
         print("-region_of_gene:")
         print("{} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
+        #print("-region_of_gene on {} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
 
-
-    ## Number of exon on the position [6] will be printed out
+    ## Number of exon and the first position will be printed out
     def get_number_of_exons(self):
         print("-number_of_exons:")
         print (self.geneinfo[6])
@@ -133,9 +130,9 @@ class Assignment1:
     def print_summary(self):
         print("All results:")
         self.get_sam_header()
-        self.get_properly_paired_reads_of_gene()
-        #self.get_gene_reads_with_indels();        # run takes long
-        self.calculate_total_average_coverage()    # run takes long
+        self.get_properly_paired_reads_of_gene()  #1258
+        #self.get_gene_reads_with_indels()         # run takes long
+        #self.calculate_total_average_coverage()    # run takes long
         #self.calculate_gene_average_coverage()    # run takes long
         self.get_number_mapped_reads()             # 6396581
         self.get_gene_symbol()                     # BDNF
