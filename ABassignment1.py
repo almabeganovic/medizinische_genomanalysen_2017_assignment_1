@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import mysql.connector
 import sys
 import pysam
@@ -55,7 +57,7 @@ class Assignment1:
 
     def get_sam_header(self):
         print("-sam_header:")
-        cmd = ["samtools view -H {}".format('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')]
+        cmd = ["samtools_0.1.18  view -H {}".format('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')]
         subprocess.call(cmd, shell=True)
         print ()
 
@@ -66,11 +68,11 @@ class Assignment1:
     def get_properly_paired_reads_of_gene(self):
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
         line_count = 0
-        #print('The proper paired reads are:')
+        print('The proper paired reads are:')
         for read in samFile.fetch("11", self.geneinfo[3], self.geneinfo[4]):
             if read.is_proper_pair:
                 line_count += 1
-                #print(read)
+                print(read)
         samFile.close()
         print('Count paired_reads_of_gene', line_count)
 
@@ -79,11 +81,11 @@ class Assignment1:
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
         line_count = 0
         print('Gene_reads_with_indels:')
-        for read in samFile:
+        for read in samFile.fetch("11", self.geneinfo[3], self.geneinfo[4]):
             columns = str(read).split("\t")
             if "I" in str(columns[5]) or "D" in str(columns[5]):
-               # print("-gene_reads_with_indels:")  #for print indels please comment
-                #print(read)                        #for print indels please comment
+                print("-gene_reads_with_indels:")  #for print indels please comment
+                print(read)                        #for print indels please comment
                 line_count += 1
         samFile.close()
         print('Count Reads_with_indels', line_count)
@@ -138,7 +140,7 @@ class Assignment1:
     def get_region_of_gene(self):
         print("-region_of_gene:")
         print("{} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
-        #print("-region_of_gene on {} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
+        print("-region_of_gene on {} starts with {} and ends with {}".format(self.geneinfo[2], self.geneinfo[3], self.geneinfo[4]))
 
     ## Number of exon and the first position will be printed out
     def get_number_of_exons(self):
@@ -149,9 +151,9 @@ class Assignment1:
     def print_summary(self):
         print("All results:")
         self.get_sam_header()
-        self.get_properly_paired_reads_of_gene()      # 1258
-        self.get_gene_reads_with_indels()             # 107632 run takes long
-        self.calculate_total_average_coverage()       # 5.5786920480583815 run takes long
+        self.get_properly_paired_reads_of_gene()      # 3056
+        self.get_gene_reads_with_indels()             # 30 run takes long
+        self.calculate_total_average_coverage()       # 5.608294198569065 run takes long
         self.calculate_gene_average_coverage()        # 5.359311201846263 run takes long
         self.get_number_mapped_reads()                # 6396581
         self.get_gene_symbol()                        # BDNF
