@@ -62,39 +62,58 @@ class Assignment1:
 
 
     # http://pysam.readthedocs.io/en/latest/api.html
-    # For the function, .bam file must be sorted and indexed (samtools index HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam )
+    # For the function, .bam file must indexed (samtools index HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam )
     def get_properly_paired_reads_of_gene(self):
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
-        print('The proper paired reads are:')
+        line_count = 0
+        #print('The proper paired reads are:')
         for read in samFile.fetch("11", self.geneinfo[3], self.geneinfo[4]):
             if read.is_proper_pair:
-                print("-properly_paired_reads_of_gene:")
-                print(read)
+                line_count += 1
+                #print(read)
         samFile.close()
+        print('Count paired_reads_of_gene', line_count)
 
 
     def get_gene_reads_with_indels(self):
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
+        line_count = 0
         print('Gene_reads_with_indels:')
         for read in samFile:
             columns = str(read).split("\t")
             if "I" in str(columns[5]) or "D" in str(columns[5]):
-                print("-gene_reads_with_indels:")
-                print(read)
+               # print("-gene_reads_with_indels:")  #for print indels please comment
+                #print(read)                        #for print indels please comment
+                line_count += 1
         samFile.close()
+        print('Count Reads_with_indels', line_count)
 
-        def calculate_total_average_coverage(self):
-            a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
-            cov = a.genome_coverage(bg=True)
-            print("-total_average_coverage:")
-            print(cov)
+    def calculate_total_average_coverage(self):
+        a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
+        cov = a.genome_coverage(bg=True)
+        line_count = 0
+        total_coverage = 0
+        for line in cov:
+            line_count += 1
+            total_coverage += int(line[3])
 
-        def calculate_gene_average_coverage(self):
-            # a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
-            a = pybedtools.BedTool(self.geneinfo)
-            cov = a.coverage(bg=True)
-            print("-gene_average_coverage:")
-            print(cov.head())
+        total_average_coverage = total_coverage / line_count
+        print("-total_average_coverage:")
+        print(total_average_coverage)
+
+    def calculate_gene_average_coverage(self):
+        a = pybedtools.BedTool('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam')
+        cover = a.genome_coverage(bg=True)
+        line_count = 0
+        total_coverage = 0
+        for line in cover:
+            if int(line[1]) >= int(self.geneinfo[3]) and int(line[2]) <= int(self.geneinfo[4]):
+                line_count += 1
+                total_coverage += int(line[3])
+
+        gene_average_coverage = total_coverage / line_count
+        print("-gene_average_coverage:")
+        print(gene_average_coverage)
 
     def get_number_mapped_reads(self):
         samFile = pysam.AlignmentFile('HG00096.chrom11.ILLUMINA.bwa.GBR.low_coverage.20120522.bam', "rb")
@@ -130,14 +149,14 @@ class Assignment1:
     def print_summary(self):
         print("All results:")
         self.get_sam_header()
-        self.get_properly_paired_reads_of_gene()  #1258
-        #self.get_gene_reads_with_indels()         # run takes long
-        #self.calculate_total_average_coverage()    # run takes long
-        #self.calculate_gene_average_coverage()    # run takes long
-        self.get_number_mapped_reads()             # 6396581
-        self.get_gene_symbol()                     # BDNF
-        self.get_region_of_gene()                  # chr11 starts with 27676440 and ends with 27743605
-        self.get_number_of_exons()                 # 2
+        self.get_properly_paired_reads_of_gene()      # 1258
+        self.get_gene_reads_with_indels()             # 107632 run takes long
+        self.calculate_total_average_coverage()       # 5.5786920480583815 run takes long
+        self.calculate_gene_average_coverage()        # 5.359311201846263 run takes long
+        self.get_number_mapped_reads()                # 6396581
+        self.get_gene_symbol()                        # BDNF
+        self.get_region_of_gene()                     # chr11 starts with 27676440 and ends with 27743605
+        self.get_number_of_exons()                    # 2
 
 
 if __name__ == '__main__':
